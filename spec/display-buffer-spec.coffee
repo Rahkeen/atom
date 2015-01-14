@@ -31,9 +31,9 @@ describe "DisplayBuffer", ->
       expect(displayBuffer2.getTabLength()).toBe displayBuffer.getTabLength()
 
       expect(displayBuffer2.getMarkerCount()).toEqual displayBuffer.getMarkerCount()
-      expect(displayBuffer2.findMarker(id: 1)).toEqual marker1
-      expect(displayBuffer2.findMarker(id: 2)).toEqual marker2
-      expect(displayBuffer2.findMarker(id: 3)).toEqual marker3
+      expect(displayBuffer2.findMarker(id: 1).getBufferRange()).toEqual marker1.getBufferRange()
+      expect(displayBuffer2.findMarker(id: 2).getBufferRange()).toEqual marker2.getBufferRange()
+      expect(displayBuffer2.findMarker(id: 3).getBufferRange()).toEqual marker3.getBufferRange()
       expect(displayBuffer2.isFoldedAtBufferRow(3)).toBeTruthy()
 
       # can diverge from origin
@@ -703,7 +703,7 @@ describe "DisplayBuffer", ->
         markerCreatedHandler.reset()
 
         marker2 = buffer.markRange([[5, 4], [5, 10]])
-        expect(markerCreatedHandler).toHaveBeenCalledWith(displayBuffer.getMarker(marker2.id))
+        expect(markerCreatedHandler).not.toHaveBeenCalled()
 
       it "allows marker head and tail positions to be manipulated in both screen and buffer coordinates", ->
         marker = displayBuffer.markScreenRange([[5, 4], [5, 10]])
@@ -1030,8 +1030,8 @@ describe "DisplayBuffer", ->
         marker2 = marker1.copy(b: 3)
         expect(marker2.getBufferRange()).toEqual marker1.getBufferRange()
         expect(displayBuffer.getMarkerCount()).toBe initialMarkerCount + 2
-        expect(marker1.getProperties()).toEqual a: 1, b: 2
-        expect(marker2.getProperties()).toEqual a: 1, b: 3
+        expect(marker1.getProperties()).toEqual a: 1, b: 2, displayBufferId: displayBuffer.id
+        expect(marker2.getProperties()).toEqual a: 1, b: 3, displayBufferId: displayBuffer.id
 
     describe "Marker::getPixelRange()", ->
       it "returns the start and end positions of the marker based on the line height and character widths assigned to the DisplayBuffer", ->

@@ -107,7 +107,7 @@ class DisplayBuffer extends Model
     newDisplayBuffer.setScrollTop(@getScrollTop())
     newDisplayBuffer.setScrollLeft(@getScrollLeft())
 
-    for marker in @findMarkers(displayBufferId: @id)
+    for marker in @findMarkers()
       marker.copy(displayBufferId: newDisplayBuffer.id)
     newDisplayBuffer
 
@@ -943,7 +943,8 @@ class DisplayBuffer extends Model
   # Returns the {Marker} (if it exists).
   getMarker: (id) ->
     unless marker = @markers[id]
-      if bufferMarker = @buffer.getMarker(id)
+      if (bufferMarker = @buffer.getMarker(id)) and
+         (bufferMarker.properties.displayBufferId is @id)
         marker = new Marker({bufferMarker, displayBuffer: this})
         @markers[id] = marker
     marker
@@ -952,7 +953,7 @@ class DisplayBuffer extends Model
   #
   # Returns an {Array} of existing {Marker}s.
   getMarkers: ->
-    @buffer.getMarkers().map ({id}) => @getMarker(id)
+    @findMarkers()
 
   getMarkerCount: ->
     @buffer.getMarkerCount()
@@ -973,7 +974,8 @@ class DisplayBuffer extends Model
   # options - Options to pass to the {Marker} constructor
   #
   # Returns a {Number} representing the new marker's ID.
-  markBufferRange: (range, options) ->
+  markBufferRange: (range, options={}) ->
+    options.displayBufferId = @id
     @getMarker(@buffer.markRange(range, options).id)
 
   # Public: Constructs a new marker at the given screen position.
@@ -991,7 +993,8 @@ class DisplayBuffer extends Model
   # options - Options to pass to the {Marker} constructor
   #
   # Returns a {Number} representing the new marker's ID.
-  markBufferPosition: (bufferPosition, options) ->
+  markBufferPosition: (bufferPosition, options={}) ->
+    options.displayBufferId = @id
     @getMarker(@buffer.markPosition(bufferPosition, options).id)
 
   # Public: Removes the marker with the given id.
@@ -1029,7 +1032,8 @@ class DisplayBuffer extends Model
   # Returns an {Array} of {Marker}s
   findMarkers: (params) ->
     params = @translateToBufferMarkerParams(params)
-    @buffer.findMarkers(params).map (stringMarker) => @getMarker(stringMarker.id)
+    params.displayBufferId = @id
+    @buffer.findMarkers(params).map (bufferMarker) => @getMarker(bufferMarker.id)
 
   translateToBufferMarkerParams: (params) ->
     bufferMarkerParams = {}

@@ -525,10 +525,7 @@ class TextEditor extends Model
   copy: ->
     displayBuffer = @displayBuffer.copy()
     softTabs = @getSoftTabs()
-    newEditor = new TextEditor({@buffer, displayBuffer, @tabLength, softTabs, suppressCursorCreation: true, registerEditor: true})
-    for marker in @findMarkers(editorId: @id)
-      marker.copy(editorId: newEditor.id, preserveFolds: true)
-    newEditor
+    new TextEditor({@buffer, displayBuffer, @tabLength, softTabs, suppressCursorCreation: true, registerEditor: true})
 
   # Controls visibility based on the given {Boolean}.
   setVisible: (visible) -> @displayBuffer.setVisible(visible)
@@ -2910,7 +2907,7 @@ class TextEditor extends Model
     @displayBuffer.pixelPositionForScreenPosition(screenPosition)
 
   getSelectionMarkerAttributes: ->
-    type: 'selection', editorId: @id, invalidate: 'never'
+    type: 'selection', invalidate: 'never'
 
   getVerticalScrollMargin: -> @displayBuffer.getVerticalScrollMargin()
   setVerticalScrollMargin: (verticalScrollMargin) -> @displayBuffer.setVerticalScrollMargin(verticalScrollMargin)
